@@ -2,12 +2,10 @@ package com.example.userlogintrackinglastlocations.ui.login;
 import android.content.Context;
 import android.location.Location;
 import java.util.LinkedList;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -35,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     FusedLocationProviderClient fusedLocationProviderClient;
     TextView lattitude,longitude,address,city,country;
     Button getLocation;
+    private LocationManager locationManager;
     private final static int REQUEST_CODE = 100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 getLastLocation();
             }
         });
+
     }
     private void getLastLocation(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
@@ -63,14 +63,13 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Location location) {
                             if (location != null){
-
                                 try {
                                     Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
                                     List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                                     lattitude.setText("Lattitude: "+addresses.get(0).getLatitude());
                                     longitude.setText("Longitude: "+addresses.get(0).getLongitude());
                                     address.setText("Address: "+addresses.get(0).getAddressLine(0));
-                                   city.setText("City: "+addresses.get(0).getLocality());
+                                    city.setText("City: "+addresses.get(0).getLocality());
                                     country.setText("Country: "+addresses.get(0).getCountryName());
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -85,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
     private void askPermission() {
         ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_CODE);
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull @org.jetbrains.annotations.NotNull String[] permissions, @NonNull @org.jetbrains.annotations.NotNull int[] grantResults) {
         if (requestCode == REQUEST_CODE){
@@ -96,25 +94,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-    public class LocationHistory {
-        private LinkedList<Location> locations;
-        private static final int MAX_SIZE = 5;
-
-        public LocationHistory() {
-            locations = new LinkedList<Location>();
-        }
-
-        public void addLocation(Location location) {
-            if (locations.size() == MAX_SIZE) {
-                locations.removeFirst();
-            }
-            locations.addLast(location);
-        }
-
-        public LinkedList<Location> getLocations() {
-            return locations;
-        }
     }
 
 }
